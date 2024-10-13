@@ -5,13 +5,13 @@ const doc = {
         title: 'Users Api',
         description: 'Users Api'
     },
-    host: 'localhost:3001',
+    host: 'localhost:3003',
     schemes: ['https', 'http'],
     basePath: '/api-docs'
 };
 
 const outputFile = './swagger.json';
-const endpointsFiles = ['./routes/index.js'];
+const endpointsFiles = ['/cse-341-project2/routes/index.js'];
 
 // This will generate swagger.json
 
