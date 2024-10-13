@@ -4,7 +4,8 @@
   "description": "my first project",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -17,12 +18,14 @@
   },
   "homepage": "https://github.com/jonathanaloya/cse-341-project1#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body": "^5.1.0",
+    "body-parser": "^1.20.3",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "mongodb": "^6.9.0",
-    "body-parser": "^1.20.3",
     "swagger-autogen": "^2.23.7",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "yarn": "^1.22.22"
   }
 }
