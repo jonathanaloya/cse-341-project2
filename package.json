@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jonathanaloya/cse-341-project2.git"
+    "url": "git+https://github.com/jonathanaloya/cse-341-project1.git"
   },
   "author": "Jonathan Aloya",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jonathanaloya/cse-341-project2/issues"
+    "url": "https://github.com/jonathanaloya/cse-341-project1/issues"
   },
-  "homepage": "https://github.com/jonathanaloya/cse-341-project2#readme",
+  "homepage": "https://github.com/jonathanaloya/cse-341-project1#readme",
   "dependencies": {
     "body": "^5.1.0",
     "dotenv": "^16.4.5",
