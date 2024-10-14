@@ -13,6 +13,6 @@ const doc = {
 const outputFile = './swagger.json';
 const endpointsFiles = ['/cse-341-project2/routes/index.js'];
 
-// This will generate swagger.json
+// This will generate swagger.jsons
 
 swaggerAutogen(outputFile, endpointsFiles, doc);
