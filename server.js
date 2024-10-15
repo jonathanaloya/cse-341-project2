@@ -23,6 +23,7 @@ const swaggerDocument = JSON.parse(fs.readFileSync(path.join(__dirname, 'swagger
 app.use(express.json());
 let contacts = [];
 
+let members = [];
 // In-memory array to store users
 let users = [];
 
