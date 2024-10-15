@@ -141,7 +141,7 @@ app.post('/login', async (req, res) => {
     }
 
     // 2. Find user by email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }); // Removed timeout as it's not a valid method for mongoose
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
