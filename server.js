@@ -17,7 +17,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
-const port = process.env.PORT || 3003;
+const port = process.env.PORT || 3003; // Change this to a different port, e.g., 3000
 
 const swaggerDocument = JSON.parse(fs.readFileSync(path.join(__dirname, 'swagger.json'), 'utf8'));
 app.use(express.json());
@@ -64,57 +64,14 @@ app.get('/users/:id', isAuthenticated, (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
-// Session setup (optional, if using sessions)
-app.use(session({
-  secret: process.env.GITHUB_CLIENT_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
-}));
-
-// Swagger setup
-
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-// CORS middleware
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Z-Key');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  next();
+const server = app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
 
-// Define a route for the root URL
-app.get('/', (req, res) => {
-  let html = '<h1>Member Records</h1>';
-  html += '<ul>';
-  members.forEach(member => {
-    html += `<li>${member.firstName} ${member.lastName} - ${member.email}</li>`;
-  });
-  html += '</ul>';
-  res.send(html);
-});
-
-// Authentication routes
-app.use('/api/auth', authRoutes);
-
-// Protected route example
-app.get('/api/protected', auth, (req, res) => {
-  res.status(200).json({ message: 'This is a protected route', user: req.user });
-});
-
-// Routes
-app.use('/api', require('./cse-341-project2/routes/api'));
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+// Add error handling for the server instance
+server.on('error', (error) => {
+  console.error('Server error:', error);
+  // Handle specific error types if needed
 });
 
 // Initialize database connection
@@ -123,10 +80,8 @@ mongodb.initDb((err) => {
     console.error('Failed to connect to the database:', err);
     process.exit(1);
   } else {
-    app.listen(port, () => {
-      console.log(`Connected to DB and server running on port ${port}`);
-      console.log(`Swagger UI available at http://localhost:${port}/api-docs`);
-    });
+    console.log(`Connected to DB and server running on port ${port}`);
+    console.log(`Swagger UI available at http://localhost:${port}/api-docs`);
   }
 });
 
@@ -211,4 +166,53 @@ app.get('/me', isAuthenticated, (req, res) => {
   // Return user information without the password
   const { password, ...userInfo } = user;
   res.json(userInfo);
+});
+
+// Session setup (optional, if using sessions)
+app.use(session({
+  secret: process.env.GITHUB_CLIENT_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
+}));
+
+// Swagger setup
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// CORS middleware
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Z-Key');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  next();
+});
+
+// Define a route for the root URL
+app.get('/', (req, res) => {
+  let html = '<h1>Member Records</h1>';
+  html += '<ul>';
+  members.forEach(member => {
+    html += `<li>${member.firstName} ${member.lastName} - ${member.email}</li>`;
+  });
+  html += '</ul>';
+  res.send(html);
+});
+
+// Authentication routes
+app.use('/api/auth', authRoutes);
+
+// Protected route example
+app.get('/api/protected', auth, (req, res) => {
+  res.status(200).json({ message: 'This is a protected route', user: req.user });
+});
+
+// Routes
+app.use('/api', require('./cse-341-project2/routes/api'));
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
 });
