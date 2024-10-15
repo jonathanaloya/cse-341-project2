@@ -24,8 +24,8 @@ app.use(cors({
 const port = process.env.PORT || 3003; // Change this to a different port, e.g., 3000
 
 const swaggerDocument = JSON.parse(fs.readFileSync(path.join(__dirname, 'swagger.json'), 'utf8'));
-app.use(express.json());
-let contacts = [];
+app.use(express.json()); // Ensure you can parse JSON requests
+let contacts = []; // In-memory array to store contacts
 
 let members = [];
 // In-memory array to store users
@@ -52,8 +52,8 @@ app.post('/contacts', (req, res) => {
     name,
     email
   };
-  contacts.push(newContact);
-  res.status(201).json(newContact);
+  contacts.push(newContact); // Store the new contact
+  res.status(201).json(newContact); // Respond with the created contact
 });
 
 app.get('/users/:id', isAuthenticated, (req, res) => {
