@@ -130,6 +130,12 @@ mongodb.initDb((err) => {
   }
 });
 
+// Add error handling for unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // Application specific logging, throwing an error, or other logic here
+});
+
 // Route to register a new user
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
