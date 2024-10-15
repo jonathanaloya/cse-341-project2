@@ -6,42 +6,37 @@ const auth = require('./cse-341-project2/middleware/auth'); // Import auth middl
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
+const User = require('./cse-341-project2/models/users'); // Assuming you have a User model
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-
-dotenv.config();
-
 const app = express();
+
+require('dotenv').config(); // Ensure this is at the top of your file
+
+const mongoURI = process.env.MONGODB_URI; // Use the environment variable
+
 app.use(cors({
-  origin: 'http://localhost:3000', // Adjust this to your frontend URL
+  origin: 'http://localhost:3003', // Adjust this to your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-const port = process.env.PORT || 3003; // Change this to a different port, e.g., 3000
+
+app.use(express.json()); // Ensure you can parse JSON requests
+
+
+let contacts = []; // In-memory array to store contacts
 
 const swaggerDocument = JSON.parse(fs.readFileSync(path.join(__dirname, 'swagger.json'), 'utf8'));
-app.use(express.json()); // Ensure you can parse JSON requests
-let contacts = []; // In-memory array to store contacts
+
 
 let members = [];
 // In-memory array to store users
 let users = [];
 
-app.get('/contacts', (req, res) => {
-  res.json(contacts);
-});
-
-const isAuthenticated = (req, res, next) => {
-  if (req.session && req.session.user) {
-    return next();
-  }
-  return res.status(401).json({ error: 'Unauthorized' });
-};
-// Route to create a new contact
 app.post('/contacts', (req, res) => {
   const { name, email } = req.body;
   if (!name || !email) {
@@ -56,6 +51,37 @@ app.post('/contacts', (req, res) => {
   res.status(201).json(newContact); // Respond with the created contact
 });
 
+app.get('/contacts', (req, res) => {
+  res.json(contacts);
+});
+
+// Route to get a contact by ID
+app.get('/contacts/:id', (req, res) => {
+  const contactId = parseInt(req.params.id, 10); // Parse the ID from the URL
+  const contact = contacts.find(c => c.id === contactId); // Find the contact by ID
+
+  if (!contact) {
+    return res.status(404).json({ error: 'Contact not found' }); // Return 404 if not found
+  }
+
+  res.json(contact); // Respond with the found contact
+});
+
+const port = process.env.PORT || 3003; // Change this to a different port, e.g., 3000
+// Start the server
+const server = app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
+
+const isAuthenticated = (req, res, next) => {
+  if (req.session && req.session.user) {
+    return next();
+  }
+  return res.status(401).json({ error: 'Unauthorized' });
+};
+// Route to create a new contact
+
+
 app.get('/users/:id', isAuthenticated, (req, res) => {
   const userId = parseInt(req.params.id, 10);
   const user = users.find(u => u.id === userId);
@@ -67,10 +93,7 @@ app.get('/users/:id', isAuthenticated, (req, res) => {
   res.json(userInfo);
 });
 
-// Start the server
-const server = app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+
 
 // Add error handling for the server instance
 server.on('error', (error) => {
@@ -110,12 +133,34 @@ app.post('/register', async (req, res) => {
 // Route to log in a user
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  const user = users.find(u => u.email === email);
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ error: 'Invalid email or password' });
+
+  try {
+    // 1. Validate input
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    // 2. Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // 3. Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // 4. Create session or token (if applicable)
+    // Example: req.session.userId = user._id; // For session-based auth
+    // Example: const token = generateToken(user); // For token-based auth
+
+    res.status(200).json({ message: 'Login successful', userId: user._id });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-  req.session.user = { id: user.id, username: user.username };
-  res.json({ message: 'Logged in successfully' });
 });
 
 // Route to log out a user

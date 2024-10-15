@@ -7,13 +7,14 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000" 
+      "url": "http://localhost:3003" 
     }
   ],
   "host": "cse-341-project2-hyld.onrender.com",
   "basePath": "/",
   "schemes": [
-    "https", "http"
+    "http",
+    "https"
   ],
   "paths": {
     "/register": {
