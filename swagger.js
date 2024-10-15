@@ -6,7 +6,7 @@ const doc = {
         description: 'Users Api'
     },
     host: 'localhost:3003',
-    schemes: ['https', 'http'],
+    schemes: ['http', 'https'],
     basePath: '/api-docs'
 };
 

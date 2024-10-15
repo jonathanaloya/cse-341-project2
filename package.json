@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jonathanaloya/cse-341-project1.git"
+    "url": "git+https://github.com/jonathanaloya/cse-341-project2.git"
   },
   "author": "Jonathan Aloya",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jonathanaloya/cse-341-project1/issues"
+    "url": "https://github.com/jonathanaloya/cse-341-project2/issues"
   },
-  "homepage": "https://github.com/jonathanaloya/cse-341-project1#readme",
+  "homepage": "https://github.com/jonathanaloya/cse-341-project2#readme",
   "dependencies": {
     "basic-auth-connect": "^1.1.0",
     "bcryptjs": "^2.4.3",
