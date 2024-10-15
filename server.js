@@ -220,3 +220,28 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
+
+// Route to register a new member
+app.post('/members', (req, res) => {
+  const { firstName, lastName, email } = req.body;
+  if (!firstName || !lastName || !email) {
+    return res.status(400).json({ error: 'First name, last name, and email are required' });
+  }
+  
+  const newMember = {
+    id: members.length + 1, // Simple ID generation
+    firstName,
+    lastName,
+    email
+  };
+  
+  // Store the new member in the members array
+  members.push(newMember);
+  
+  res.status(201).json(newMember); // Respond with the created member
+});
+
+// Route to get all members
+app.get('/members', (req, res) => {
+  res.json(members); // Respond with the members array
+});
