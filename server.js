@@ -6,7 +6,7 @@ const auth = require('./cse-341-project2/middleware/auth'); // Import auth middl
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
-const User = require('./cse-341-project2/models/users'); // Assuming you have a User model
+const User = require('./cse-341-project2/models/User'); // Assuming you have a User model
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const fs = require('fs');
@@ -19,8 +19,9 @@ require('dotenv').config(); // Ensure this is at the top of your file
 
 const mongoURI = process.env.MONGODB_URI; // Use the environment variable
 
+// CORS middleware - restrict allowed origins
 app.use(cors({
-  origin: 'http://localhost:3003', // Adjust this to your frontend URL
+  origin: ['http://localhost:3003'], // Specify allowed origins
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -124,7 +125,9 @@ app.post('/register', async (req, res) => {
   if (!username || !email || !password) {
     return res.status(400).json({ error: 'Username, email, and password are required' });
   }
-  const hashedPassword = await bcrypt.hash(password, 10);
+  // Additional validation can be added here
+
+  const hashedPassword = await bcrypt.hash(password, 12); // Use a higher number of rounds
   const newUser = { id: users.length + 1, username, email, password: hashedPassword };
   users.push(newUser);
   res.status(201).json({ message: 'User registered successfully' });
@@ -217,12 +220,16 @@ app.get('/me', isAuthenticated, (req, res) => {
   res.json(userInfo);
 });
 
-// Session setup (optional, if using sessions)
+// Session setup with secure options
 app.use(session({
   secret: process.env.GITHUB_CLIENT_SECRET,
   resave: false,
   saveUninitialized: true,
   store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
+  cookie: {
+    httpOnly: true, // Prevent client-side access to cookies
+    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+  },
 }));
 
 // Swagger setup
