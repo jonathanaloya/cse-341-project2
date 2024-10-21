@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-router.use('/api', require('./api'));
+router.use('/contacts', require('./contacts'));
+router.use('/auth', require('./auth'));
 
 module.exports = router;
