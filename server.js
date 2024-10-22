@@ -39,10 +39,10 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   store: MongoStore.create({ mongoUrl: mongoURI }),
-  // cookie: {
-  //   httpOnly: true,
-  //   secure: process.env.NODE_ENV === 'production',
-  // },
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  },
 }));
 
 // Passport setup

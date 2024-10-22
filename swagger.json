@@ -269,20 +269,6 @@
           }
         }
       }
-    },
-    "securitySchemes": {
-      "googleOAuth": {
-        "type": "oauth2",
-        "flows": {
-          "authorizationCode": {
-            "authorizationUrl": "https://google.com/login/oauth/authorize",
-            "tokenUrl": "https://google.com/login/oauth/access_token",
-            "scopes": {
-              "user:email": "Access to user's email address"
-            }
-          }
-        }
-      }
     }
   }
 }
