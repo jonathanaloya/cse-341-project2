@@ -11,7 +11,7 @@
       "description": "Local development server"
     }
   ],
-  "host": "http://cse-341-project2-hyld.onrender.com",
+  "host": "localhost:3000",
   "basePath": "/",
   "schemes": [
     "http"
