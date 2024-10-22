@@ -1,13 +1,16 @@
 const express = require('express');
 const passport = require('passport');
+const { isAuthenticated } = require('../middleware/auth');
 const router = express.Router();
 
-// GitHub OAuth routes
-router.get('/github',
-  passport.authenticate('github', { scope: ['user:email'] }));
+// Login route
 
-router.get('/github/callback', 
-  passport.authenticate('github', { failureRedirect: '/login' }),
+// google OAuth routes
+router.get('/login',
+  passport.authenticate('google', { scope: ['profile'] }));
+
+router.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home.
     res.redirect('/');

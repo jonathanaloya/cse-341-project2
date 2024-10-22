@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Contact Management API",
-    "description": "API for managing contacts with GitHub OAuth authentication",
+    "description": "API for managing contacts with google OAuth authentication",
     "version": "1.0.0"
   },
   "servers": [
@@ -43,7 +43,7 @@
         },
         "security": [
           {
-            "githubOAuth": []
+            "googleOAuth": []
           }
         ]
       },
@@ -75,7 +75,7 @@
         },
         "security": [
           {
-            "githubOAuth": []
+            "googleOAuth": []
           }
         ]
       }
@@ -116,7 +116,7 @@
         },
         "security": [
           {
-            "githubOAuth": []
+            "googleOAuth": []
           }
         ]
       },
@@ -161,7 +161,7 @@
         },
         "security": [
           {
-            "githubOAuth": []
+            "googleOAuth": []
           }
         ]
       },
@@ -193,24 +193,24 @@
         },
         "security": [
           {
-            "githubOAuth": []
+            "googleOAuth": []
           }
         ]
       }
     },
-    "/auth/github": {
+    "/auth/google": {
       "get": {
-        "summary": "Initiate GitHub OAuth flow",
+        "summary": "Initiate google OAuth flow",
         "responses": {
           "302": {
-            "description": "Redirect to GitHub login"
+            "description": "Redirect to google login"
           }
         }
       }
     },
-    "/auth/github/callback": {
+    "/auth/google/callback": {
       "get": {
-        "summary": "GitHub OAuth callback",
+        "summary": "google OAuth callback",
         "responses": {
           "302": {
             "description": "Redirect after successful authentication"
@@ -271,12 +271,12 @@
       }
     },
     "securitySchemes": {
-      "githubOAuth": {
+      "googleOAuth": {
         "type": "oauth2",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "https://github.com/login/oauth/authorize",
-            "tokenUrl": "https://github.com/login/oauth/access_token",
+            "authorizationUrl": "https://google.com/login/oauth/authorize",
+            "tokenUrl": "https://google.com/login/oauth/access_token",
             "scopes": {
               "user:email": "Access to user's email address"
             }
