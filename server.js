@@ -106,7 +106,7 @@ app.use((req, res, next) => {
 app.use('/', require('./cse-341-project2/routes'));
 
 // Define a route for the root URL
-routes.get('/', (req, res) => {
+app.get('/', (req, res) => {
   res.send(
     req.session.user !== undefined
       ? `${req.session.user.displayName} -- Welcome to Contatcs API by Jonathan Aloya`
