@@ -61,12 +61,12 @@ function(accessToken, refreshToken, profile, done) {
 }
 ));
 
-passport.serializeUser((user, done) => {
-  done(null, user);
+passport.serializeUser((profile, done) => {
+  done(null, profile);
 });
 
-passport.deserializeUser((user, done) => {
-  done(null, user);
+passport.deserializeUser((profile, done) => {
+  done(null, profile);
 });
 
 // CORS middleware
