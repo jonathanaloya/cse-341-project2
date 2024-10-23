@@ -6,7 +6,7 @@ const doc = {
         description: 'Users Api'
     },
     host: 'cse-341-project2-hyld.onrender.com',
-    schemes: ['https'],
+    schemes: ['http'],
     basePath: '/api-docs'
 };
 
