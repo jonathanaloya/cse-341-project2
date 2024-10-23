@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000",
+      "url": "https://cse-341-project2-hyld.onrender.com",
       "description": "Local development server"
     }
   ],
