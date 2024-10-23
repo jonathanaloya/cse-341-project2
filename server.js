@@ -10,6 +10,8 @@ const MongoStore = require('connect-mongo');
 const path = require('path');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const User = require('./cse-341-project2/models/User');
+const { userInfo } = require('os');
 
 dotenv.config();
 
@@ -56,7 +58,7 @@ passport.use(
   callbackURL: `/auth/google/callback`
 },
 async function(accessToken, refreshToken, profile, done) {
-   
+  console.log(profile);
   const newUser = {
             googleId: profile.id,
             displayName: profile.displayName,
@@ -77,18 +79,15 @@ async function(accessToken, refreshToken, profile, done) {
           } catch (err) {
             console.error(err)
           }
-        
-  // Here you would typically find or create a user in your database
-  return done(null, profile);
 }
 ));
 
-passport.serializeUser((profile, done) => {
-  done(null, profile);
+passport.serializeUser((user, done) => {
+  done(null, user);
 });
 
-passport.deserializeUser((profile, done) => {
-  done(null, profile);
+passport.deserializeUser((user, done) => {
+  done(null, user);
 });
 
 // CORS middleware
