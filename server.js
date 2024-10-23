@@ -55,7 +55,29 @@ passport.use(
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: `/auth/google/callback`
 },
-function(accessToken, refreshToken, profile, done) {
+async function(accessToken, refreshToken, profile, done) {
+   
+  const newUser = {
+            googleId: profile.id,
+            displayName: profile.displayName,
+            firstName: profile.name.givenName,
+            lastName: profile.name.familyName,
+            image: profile.photos[0].value,
+          }
+   
+          try {
+            let user = await User.findOne({ googleId: profile.id })
+   
+            if (user) {
+              done(null, user)
+            } else {
+              user = await User.create(newUser)
+              done(null, user)
+            }
+          } catch (err) {
+            console.error(err)
+          }
+        
   // Here you would typically find or create a user in your database
   return done(null, profile);
 }
@@ -84,8 +106,12 @@ app.use((req, res, next) => {
 app.use('/', require('./cse-341-project2/routes'));
 
 // Define a route for the root URL
-app.get('/', (req, res) => {
-  res.send('Welcome to the Contact Management API!');
+routes.get('/', (req, res) => {
+  res.send(
+    req.session.user !== undefined
+      ? `${req.session.user.displayName} -- Welcome to Contatcs API by Jonathan Aloya`
+      : 'Logged Out'
+  );
 });
 
 // Error handling middleware
