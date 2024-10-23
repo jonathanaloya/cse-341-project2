@@ -58,7 +58,6 @@ passport.use(
   callbackURL: `/auth/google/callback`
 },
 async function(accessToken, refreshToken, profile, done) {
-  console.log(profile);
   const newUser = {
             googleId: profile.id,
             displayName: profile.displayName,
@@ -67,18 +66,22 @@ async function(accessToken, refreshToken, profile, done) {
             image: profile.photos[0].value,
           }
    
-          try {
-            let user = await User.findOne({ googleId: profile.id })
-   
+          try {            
+            let user = await mongodb
+            .getDb()
+            .collection('users')
+            .findOne({ googleId: profile.id });
+
             if (user) {
               done(null, user)
             } else {
-              user = await User.create(newUser)
+              user = await mongodb.getDb().collection('users').insertOne(newUser);
               done(null, user)
             }
           } catch (err) {
             console.error(err)
           }
+
 }
 ));
 
@@ -106,6 +109,7 @@ app.use('/', require('./cse-341-project2/routes'));
 
 // Define a route for the root URL
 app.get('/', (req, res) => {
+  console.log(req.session.user);
   res.send(
     req.session.user !== undefined
       ? `${req.session.user.displayName} -- Welcome to Contatcs API by Jonathan Aloya`

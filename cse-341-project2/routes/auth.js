@@ -9,7 +9,10 @@ router.get('/login',
 
 router.get('/auth/google/callback', 
   passport.authenticate('google', { failureRedirect: '/login' }),
+  
   function(req, res) {
+    console.log(req.user);
+    req.session.user = req.user;
     // Successful authentication, redirect home.
     res.redirect('/');
   });
