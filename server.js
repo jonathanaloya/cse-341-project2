@@ -112,9 +112,9 @@ app.use((req, res, next) => {
 
 // Define a route for the root URL
 app.get('/', (req, res) => {
-  console.log(req.session.user);
+  console.log("Session User", req.session.user);
   res.send(
-    req.session.user !== undefined
+    req.session.user !== undefined 
       ? `${req.session.user.displayName} -- Welcome to Contatcs API by Jonathan Aloya`
       : 'Logged Out'
   );
