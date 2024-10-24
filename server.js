@@ -16,6 +16,9 @@ const { ObjectId } = require('mongodb');
 
 dotenv.config();
 
+const app = express();
+const port = process.env.PORT || 3000;
+
 passport.use(
   new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
@@ -32,19 +35,22 @@ async function(accessToken, refreshToken, profile, done) {
           }
    
           try {            
-            const result = await mongodb
+            let user = await mongodb
             .getDb()
             .collection('users')
-            .insertOne(newUser);
-            done(null, { ...newUser, _id: result.insertedId }); // Make sure to include the _id from MongoDB
+            .findOne({googleId: profile.id});
 
-            if (User) {
-              done(null, User)
+            if (user) {
+              done(null, user)
             } else {
-              User = await mongodb.getDb().collection('users').insertOne(newUser);
-              done(null, User)
+              const result = await mongodb
+                .getDb()
+                .collection('users')
+                .insertOne(newUser);
+              done(null, { ...newUser, _id: result.insertedId }); // Make sure to include the _id from MongoDB
             }
           } catch (err) {
+            done(err, null);
             console.error(err)
           }
 
@@ -69,16 +75,8 @@ passport.deserializeUser(async (id, done) => {
 
 // Swagger setup
 const swaggerDocument = JSON.parse(fs.readFileSync(path.join(__dirname, 'swagger.json'), 'utf8'));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-
-// Passport setup
-app.use(passport.initialize());
-app.use(passport.session());
-
-
-
-const app = express();
-const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
@@ -97,7 +95,9 @@ app.use(
     store: MongoStore.create({ mongoUrl: mongoURI }),
   })
 );
-
+// Passport setup
+app.use(passport.session());
+app.use(passport.initialize());
 
 // CORS middleware
 app.use((req, res, next) => {
@@ -132,6 +132,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true // Allow credentials
 }));
+
 
 // Routes
 app.use('/', require('./cse-341-project2/routes'));
