@@ -12,44 +12,9 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('./cse-341-project2/models/User');
 const { userInfo } = require('os');
+const { ObjectId } = require('mongodb');
 
 dotenv.config();
-
-const app = express();
-const port = process.env.PORT || 3000;
-
-app.use(bodyParser.json());
-
-app.use(cors({
-  origin: '*', // Allow all origins
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true // Allow credentials
-}));
-
-app.use(express.json());
-
-const mongoURI = process.env.MONGODB_URI;
-
-// Swagger setup
-const swaggerDocument = JSON.parse(fs.readFileSync(path.join(__dirname, 'swagger.json'), 'utf8'));
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-// Session setup
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-  },
-}));
-
-// Passport setup
-app.use(passport.initialize());
-app.use(passport.session());
 
 passport.use(
   new GoogleStrategy({
@@ -67,16 +32,17 @@ async function(accessToken, refreshToken, profile, done) {
           }
    
           try {            
-            let user = await mongodb
+            const result = await mongodb
             .getDb()
             .collection('users')
-            .findOne({ googleId: profile.id });
+            .insertOne(newUser);
+            done(null, { ...newUser, _id: result.insertedId }); // Make sure to include the _id from MongoDB
 
-            if (user) {
-              done(null, user)
+            if (User) {
+              done(null, User)
             } else {
-              user = await mongodb.getDb().collection('users').insertOne(newUser);
-              done(null, user)
+              User = await mongodb.getDb().collection('users').insertOne(newUser);
+              done(null, User)
             }
           } catch (err) {
             console.error(err)
@@ -86,12 +52,52 @@ async function(accessToken, refreshToken, profile, done) {
 ));
 
 passport.serializeUser((user, done) => {
-  done(null, user);
+  done(null, user._id); // Use _id instead of id (this is the difference in mongoose vs mongodb
 });
 
-passport.deserializeUser((user, done) => {
-  done(null, user);
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await mongodb
+      .getDb()
+      .collection('users')
+      .findOne({ _id: ObjectId.createFromHexString(id) });
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
 });
+
+// Swagger setup
+const swaggerDocument = JSON.parse(fs.readFileSync(path.join(__dirname, 'swagger.json'), 'utf8'));
+
+
+// Passport setup
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.use(bodyParser.json());
+
+app.use(express.json());
+
+const mongoURI = process.env.MONGODB_URI;
+
+
+// Session setup
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }, //Set to true in production with HTTPS
+    store: MongoStore.create({ mongoUrl: mongoURI }),
+  })
+);
+
 
 // CORS middleware
 app.use((req, res, next) => {
@@ -103,9 +109,6 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   next();
 });
-
-// Routes
-app.use('/', require('./cse-341-project2/routes'));
 
 // Define a route for the root URL
 app.get('/', (req, res) => {
@@ -122,6 +125,16 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
+
+app.use(cors({
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // Allow credentials
+}));
+
+// Routes
+app.use('/', require('./cse-341-project2/routes'));
 
 // Initialize database connection
 mongodb.initDb((err) => {

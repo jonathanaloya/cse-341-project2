@@ -7,15 +7,19 @@ const router = express.Router();
 router.get('/login',
   passport.authenticate('google', { scope: ['profile'] }));
 
-router.get('/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  
-  function(req, res) {
-    console.log(req.user);
-    req.session.user = req.user;
-    // Successful authentication, redirect home.
-    res.redirect('/');
-  });
+  router.get(
+    '/auth/google/callback',
+    passport.authenticate('google', {
+      failureRedirect: '/api-docs',
+      session: true,
+    }),
+   
+    function (req, res) {
+      req.session.user = req.user;
+      // Successful authentication, redirect home.
+      res.redirect('/');
+    }
+  );
 
 // Logout route
 router.get('/logout', (req, res) => {
